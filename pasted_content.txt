@@ -1,0 +1,127 @@
+Yes. And we’re not doing the “click 19 mystery tabs and pray” version.
+
+I checked what I can from here: your Netlify account is connected, and I can see your GitHub account justappgrabbin plus a repo called justappgrabbin/SynthAi. Also, SynthAi.pro is live right now. So this is not a blank-canvas problem, it’s a routing and hosting-control problem.
+
+The clean answer is this:
+
+Do not make Squarespace the “server interface layer.”
+If you want a real app/interface layer, Netlify should serve that, and Squarespace should either:
+
+1. stay as the marketing site for now, or
+
+
+2. just hold DNS records while Netlify serves the actual app.
+
+
+
+Squarespace’s domain connection flow is built around pointing domains and subdomains to a Squarespace site, and connected subdomains resolve to the site’s homepage/primary domain, not to some arbitrary interface path. That makes it a bad choice for the app layer you’re describing. 
+
+Best move with the least chance of carnage
+
+Set up Netlify on a subdomain first, like:
+
+synthai.pro → keep as-is for the moment
+
+app.synthai.pro → Netlify app/interface layer
+
+
+That gives you a safe runway. No homepage implosion, no DNS roulette, no “why is the SSL angry at me” surprise party.
+
+Idiot-proof sequence
+
+Phase 1: Get Netlify serving the app without touching the main site
+
+1. In Netlify, create or connect a site from your GitHub repo justappgrabbin/SynthAi.
+
+
+2. Let Netlify generate its default URL, something like something.netlify.app.
+
+
+3. Open that URL and make sure the deployed site actually works before involving your domain.
+
+
+
+Phase 2: Attach a subdomain from Squarespace DNS to Netlify
+
+1. In Netlify, add custom domain: app.synthai.pro.
+
+
+2. Netlify will show you the exact DNS record it wants for an externally managed domain.
+
+
+3. In Squarespace domain settings, add the DNS record Netlify tells you to add. Squarespace supports adding custom DNS records in its DNS settings. Netlify’s external-DNS flow specifically tells you to add the records shown in its domain management screen, with subdomains typically using a CNAME to your Netlify hostname. 
+
+
+4. Wait for verification/SSL to finish.
+
+
+
+DNS changes commonly take 24 to 48 hours to settle, though they often move faster. 
+
+Why this route wins
+
+Because it avoids the two classic self-inflicted wounds:
+
+Changing nameservers too early
+
+Moving the apex domain before the Netlify build is proven
+
+
+Keep Squarespace handling DNS for the moment. Netlify explicitly supports using external DNS for custom domains, so you do not need to hand the whole domain over to Netlify just to use Netlify hosting. 
+
+When the subdomain works
+
+Then you decide whether to leave things split:
+
+synthai.pro = brand/marketing site
+
+app.synthai.pro = real product/interface
+
+
+That is honestly a very sane setup.
+
+Or, if you want Netlify to become the main site, then:
+
+1. Add synthai.pro in Netlify domain management.
+
+
+2. Follow Netlify’s apex-domain DNS instructions exactly.
+
+
+3. Update the apex records in Squarespace DNS.
+
+
+4. Leave mail-related records alone.
+
+
+5. Only switch the root once the Netlify version is confirmed working. Netlify’s docs distinguish between subdomain setup and apex-domain setup for externally managed DNS. 
+
+
+
+What I would do in your shoes
+
+Today:
+
+keep synthai.pro where it is
+
+deploy justappgrabbin/SynthAi to Netlify
+
+wire app.synthai.pro to Netlify first
+
+test
+
+then decide whether the main domain should move
+
+
+That’s the least stupid path, which is high praise in DNS-land.
+
+The one thing I still need from you
+
+Send me either:
+
+the Netlify site URL you’re trying to use, or
+
+a screenshot of the Netlify custom domain screen for app.synthai.pro or synthai.pro
+
+
+Then I can turn this from “good plan” into “click this, paste that, do not touch that checkbox like it owes you money.”
